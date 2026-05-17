@@ -19,6 +19,7 @@ func main() {
 	url := flag.String("url", "http://127.0.0.1:8080/remnawave", "Webhook URL")
 	secret := flag.String("secret", "change-me", "Webhook HMAC secret")
 	payloadPath := flag.String("payload", "testdata/torrent_blocker_report.json", "Path to webhook payload JSON")
+	timeout := flag.Duration("timeout", 30*time.Second, "HTTP client timeout")
 	flag.Parse()
 
 	body, timestamp, err := preparePayload(*payloadPath)
@@ -37,7 +38,7 @@ func main() {
 	req.Header.Set("X-Remnawave-Timestamp", timestamp)
 	req.Header.Set("User-Agent", "Remnawave-test")
 
-	client := http.Client{Timeout: 10 * time.Second}
+	client := http.Client{Timeout: *timeout}
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatalf("send request: %v", err)
