@@ -9,8 +9,8 @@ services:
       WEBHOOK_MAX_CLOCK_SKEW_SECONDS: "300"
       SQLITE_PATH: "/data/events.db"
       DEDUP_TTL_HOURS: "168"
-      TELEGRAM_BOT_TOKEN: "change-me"
       TELEGRAM_PARSE_MODE: "HTML"
+      MESSENGER_DRY_RUN: "true"
       RESOLVER_DESCRIPTION_LOGIN_ENABLED: "true"
     volumes:
       - ./data:/data
