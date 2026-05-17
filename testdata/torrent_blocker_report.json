@@ -1,0 +1,42 @@
+{
+  "scope": "torrent_blocker",
+  "event": "torrent_blocker.report",
+  "timestamp": "2026-05-17T20:59:30.524Z",
+  "data": {
+    "node": {
+      "uuid": "5a371356-90db-4cef-aefc-11b07ab1d82a",
+      "name": "nl-ams-3",
+      "address": "45.142.164.36"
+    },
+    "user": {
+      "uuid": "ea176af8-b899-432e-ad6b-7574427993ef",
+      "id": 7280,
+      "shortUuid": "jv-dpehLzBKaehw7",
+      "username": "us_301",
+      "status": "ACTIVE",
+      "telegramId": null,
+      "email": null,
+      "description": "SHM: login=@783272415, name=Sergey R, url=https://t.me/Sergey_r82",
+      "subscriptionUrl": "https://sub.vpn-for-friends.com/jv-dpehLzBKaehw7"
+    },
+    "report": {
+      "actionReport": {
+        "blocked": true,
+        "ip": "93.100.116.7",
+        "blockDuration": 60,
+        "willUnblockAt": "2026-05-17T21:00:22.958Z",
+        "userId": "7280",
+        "processedAt": "2026-05-17T20:59:22.958Z"
+      },
+      "xrayReport": {
+        "email": "7280",
+        "protocol": "bittorrent",
+        "network": "tcp",
+        "source": "93.100.116.7:51843",
+        "destination": "156.146.50.4:34829",
+        "inboundTag": "VLESS TCP REALITY (DS)",
+        "outboundTag": "RW_TB_OUTBOUND_BLOCK"
+      }
+    }
+  }
+}
