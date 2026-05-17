@@ -11,7 +11,7 @@ run:
 	LISTEN_ADDR=:8080 \
 	WEBHOOK_SECRET_HEADER=change-me \
 	SQLITE_PATH=./data/events.db \
-	TELEGRAM_BOT_TOKEN=change-me \
+	MESSENGER_DRY_RUN=true \
 	go run ./cmd/vff-remnawave-events
 
 docker-build:
