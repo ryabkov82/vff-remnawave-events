@@ -43,8 +43,15 @@ func NewDefault(cfg config.Config, store *dedup.Store) *Server {
 		cfg,
 		store,
 		resolver.NewDescriptionResolver(cfg.ResolverDescriptionEnabled),
-		telegram.NewClient(cfg.TelegramBotToken, cfg.TelegramParseMode),
+		newMessenger(cfg),
 	)
+}
+
+func newMessenger(cfg config.Config) Messenger {
+	if cfg.MessengerDryRun {
+		return telegram.NewDryRunClient()
+	}
+	return telegram.NewClient(cfg.TelegramBotToken, cfg.TelegramParseMode)
 }
 
 func (s *Server) Routes() http.Handler {
