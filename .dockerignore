@@ -1,0 +1,28 @@
+.git
+.gitignore
+.github
+
+# Local runtime data
+data/
+*.db
+*.db-shm
+*.db-wal
+
+# Local binaries
+/vff-remnawave-events
+/send-test-webhook
+/bin/
+
+# Env/secrets
+.env
+.env.*
+!.env.example
+
+# Logs/temp
+*.log
+*.tmp
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
