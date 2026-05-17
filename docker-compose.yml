@@ -1,0 +1,18 @@
+services:
+  vff-remnawave-events:
+    build: .
+    container_name: vff-remnawave-events
+    restart: unless-stopped
+    environment:
+      LISTEN_ADDR: ":8080"
+      WEBHOOK_SECRET_HEADER: "change-me"
+      WEBHOOK_MAX_CLOCK_SKEW_SECONDS: "300"
+      SQLITE_PATH: "/data/events.db"
+      DEDUP_TTL_HOURS: "168"
+      TELEGRAM_BOT_TOKEN: "change-me"
+      TELEGRAM_PARSE_MODE: "HTML"
+      RESOLVER_DESCRIPTION_LOGIN_ENABLED: "true"
+    volumes:
+      - ./data:/data
+    ports:
+      - "8080:8080"
