@@ -5,6 +5,7 @@ tidy:
 
 build:
 	go build ./cmd/vff-remnawave-events
+	go build ./cmd/send-test-webhook
 
 run:
 	LISTEN_ADDR=:8080 \
@@ -23,4 +24,4 @@ docker-down:
 	docker compose down
 
 smoke-test:
-	python3 scripts/send-test-webhook.py --secret change-me
+	go run ./cmd/send-test-webhook --secret change-me
