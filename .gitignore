@@ -1,0 +1,22 @@
+# Binaries
+/vff-remnawave-events
+/bin/
+
+# Env/secrets
+.env
+.env.*
+!.env.example
+
+# Runtime data
+/data/
+*.db
+*.db-shm
+*.db-wal
+
+# Go
+*.test
+coverage.out
+
+# IDE
+.idea/
+.vscode/
