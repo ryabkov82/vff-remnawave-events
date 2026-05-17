@@ -17,6 +17,7 @@ type Config struct {
 	DedupTTL                   time.Duration
 	TelegramBotToken           string
 	TelegramParseMode          string
+	MessengerDryRun            bool
 	ResolverDescriptionEnabled bool
 }
 
@@ -30,14 +31,15 @@ func Load() (Config, error) {
 		DedupTTL:                   time.Duration(getenvInt("DEDUP_TTL_HOURS", 168)) * time.Hour,
 		TelegramBotToken:           os.Getenv("TELEGRAM_BOT_TOKEN"),
 		TelegramParseMode:          getenv("TELEGRAM_PARSE_MODE", "HTML"),
+		MessengerDryRun:            getenvBool("MESSENGER_DRY_RUN", false),
 		ResolverDescriptionEnabled: getenvBool("RESOLVER_DESCRIPTION_LOGIN_ENABLED", true),
 	}
 
 	if cfg.WebhookSecretHeader == "" {
 		return cfg, errors.New("WEBHOOK_SECRET_HEADER is required")
 	}
-	if cfg.TelegramBotToken == "" {
-		return cfg, errors.New("TELEGRAM_BOT_TOKEN is required")
+	if cfg.TelegramBotToken == "" && !cfg.MessengerDryRun {
+		return cfg, errors.New("TELEGRAM_BOT_TOKEN is required unless MESSENGER_DRY_RUN=true")
 	}
 
 	return cfg, nil
