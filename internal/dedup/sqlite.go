@@ -2,6 +2,8 @@ package dedup
 
 import (
 	"database/sql"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -16,6 +18,10 @@ type Store struct {
 }
 
 func Open(sqlitePath string) (*Store, error) {
+	if err := ensureParentDir(sqlitePath); err != nil {
+		return nil, err
+	}
+
 	db, err := sql.Open("sqlite3", sqlitePath)
 	if err != nil {
 		return nil, err
@@ -68,4 +74,17 @@ func (s *Store) DeleteOlderThan(ttl time.Duration) error {
 	cutoff := time.Now().Add(-ttl).UTC().Format("2006-01-02 15:04:05")
 	_, err := s.db.Exec(`DELETE FROM processed_events WHERE created_at < ?`, cutoff)
 	return err
+}
+
+func ensureParentDir(path string) error {
+	if path == "" || path == ":memory:" {
+		return nil
+	}
+
+	dir := filepath.Dir(path)
+	if dir == "." || dir == "" {
+		return nil
+	}
+
+	return os.MkdirAll(dir, 0o755)
 }
