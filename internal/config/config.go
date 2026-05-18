@@ -25,6 +25,7 @@ type Config struct {
 	SHMAdminLogin               string
 	SHMAdminPassword            string
 	SHMRequestTimeout           time.Duration
+	SHMServiceCategoryCacheTTL  time.Duration
 	TelegramBotTokensByCategory map[string]string
 }
 
@@ -49,6 +50,7 @@ func Load() (Config, error) {
 		SHMAdminLogin:               os.Getenv("SHM_ADMIN_LOGIN"),
 		SHMAdminPassword:            os.Getenv("SHM_ADMIN_PASSWORD"),
 		SHMRequestTimeout:           time.Duration(getenvInt("SHM_REQUEST_TIMEOUT_SECONDS", 10)) * time.Second,
+		SHMServiceCategoryCacheTTL:  time.Duration(getenvInt("SHM_SERVICE_CATEGORY_CACHE_TTL_HOURS", 24)) * time.Hour,
 		TelegramBotTokensByCategory: botTokensByCategory,
 	}
 
