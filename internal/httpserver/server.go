@@ -52,7 +52,7 @@ func NewDefault(cfg config.Config, store *dedup.Store) *Server {
 func newMessenger(cfg config.Config) EventMessenger {
 	var categoryResolver telegram.CategoryResolver
 	if cfg.SHMAdminBaseURL != "" {
-		categoryResolver = shm.NewClient(cfg.SHMAdminBaseURL, cfg.SHMAdminAuthHeaderName, cfg.SHMAdminAuthHeaderValue, cfg.SHMRequestTimeout)
+		categoryResolver = shm.NewClient(cfg.SHMAdminBaseURL, cfg.SHMAdminLogin, cfg.SHMAdminPassword, cfg.SHMRequestTimeout)
 	}
 	return telegram.NewRoutedClient(cfg.TelegramBotToken, cfg.TelegramParseMode, categoryResolver, cfg.TelegramBotTokensByCategory, cfg.MessengerDryRun)
 }
