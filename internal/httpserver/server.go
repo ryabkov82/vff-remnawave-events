@@ -1,6 +1,7 @@
 package httpserver
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"log"
@@ -19,12 +20,8 @@ type RecipientResolver interface {
 	Resolve(user remnawave.UserData) (string, bool)
 }
 
-type Messenger interface {
-	SendMessage(chatID, text string) error
-}
-
 type EventMessenger interface {
-	SendEventMessage(r *http.Request, event remnawave.Event, chatID, text string) error
+	SendEventMessage(ctx context.Context, event remnawave.Event, chatID, text string) error
 }
 
 type Server struct {
@@ -122,7 +119,7 @@ func (s *Server) remnawave(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.messenger.SendEventMessage(r, event, chatID, notify.TorrentBlockMessage(event)); err != nil {
+	if err := s.messenger.SendEventMessage(r.Context(), event, chatID, notify.TorrentBlockMessage(event)); err != nil {
 		log.Printf("telegram send failed chat_id=%s user_id=%s error=%v", chatID, remnawave.RawToString(event.Data.User.ID), err)
 		writeJSON(w, http.StatusOK, map[string]string{"status": "telegram_failed"})
 		return
