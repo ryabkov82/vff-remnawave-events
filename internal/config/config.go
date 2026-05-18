@@ -12,19 +12,19 @@ import (
 
 // Config contains runtime settings loaded from environment variables.
 type Config struct {
-	ListenAddr                 string
-	WebhookSecretHeader        string
-	WebhookMaxClockSkew        time.Duration
-	SQLitePath                 string
-	DedupTTL                   time.Duration
-	TelegramBotToken           string
-	TelegramParseMode          string
-	MessengerDryRun            bool
-	ResolverDescriptionEnabled bool
-	SHMAdminBaseURL            string
-	SHMAdminAuthHeaderName     string
-	SHMAdminAuthHeaderValue    string
-	SHMRequestTimeout          time.Duration
+	ListenAddr                  string
+	WebhookSecretHeader         string
+	WebhookMaxClockSkew         time.Duration
+	SQLitePath                  string
+	DedupTTL                    time.Duration
+	TelegramBotToken            string
+	TelegramParseMode           string
+	MessengerDryRun             bool
+	ResolverDescriptionEnabled  bool
+	SHMAdminBaseURL             string
+	SHMAdminLogin               string
+	SHMAdminPassword            string
+	SHMRequestTimeout           time.Duration
 	TelegramBotTokensByCategory map[string]string
 }
 
@@ -46,8 +46,8 @@ func Load() (Config, error) {
 		MessengerDryRun:             getenvBool("MESSENGER_DRY_RUN", false),
 		ResolverDescriptionEnabled:  getenvBool("RESOLVER_DESCRIPTION_LOGIN_ENABLED", true),
 		SHMAdminBaseURL:             strings.TrimRight(getenv("SHM_ADMIN_BASE_URL", ""), "/"),
-		SHMAdminAuthHeaderName:      getenv("SHM_ADMIN_AUTH_HEADER_NAME", ""),
-		SHMAdminAuthHeaderValue:     os.Getenv("SHM_ADMIN_AUTH_HEADER_VALUE"),
+		SHMAdminLogin:               os.Getenv("SHM_ADMIN_LOGIN"),
+		SHMAdminPassword:            os.Getenv("SHM_ADMIN_PASSWORD"),
 		SHMRequestTimeout:           time.Duration(getenvInt("SHM_REQUEST_TIMEOUT_SECONDS", 10)) * time.Second,
 		TelegramBotTokensByCategory: botTokensByCategory,
 	}
@@ -58,11 +58,13 @@ func Load() (Config, error) {
 	if cfg.TelegramBotToken == "" && len(cfg.TelegramBotTokensByCategory) == 0 && !cfg.MessengerDryRun {
 		return cfg, errors.New("TELEGRAM_BOT_TOKEN or TELEGRAM_BOT_TOKENS_BY_CATEGORY_JSON is required unless MESSENGER_DRY_RUN=true")
 	}
-	if len(cfg.TelegramBotTokensByCategory) > 0 && cfg.SHMAdminBaseURL == "" {
-		return cfg, errors.New("SHM_ADMIN_BASE_URL is required when TELEGRAM_BOT_TOKENS_BY_CATEGORY_JSON is set")
-	}
-	if (cfg.SHMAdminAuthHeaderName == "") != (cfg.SHMAdminAuthHeaderValue == "") {
-		return cfg, errors.New("SHM_ADMIN_AUTH_HEADER_NAME and SHM_ADMIN_AUTH_HEADER_VALUE must be set together")
+	if len(cfg.TelegramBotTokensByCategory) > 0 {
+		if cfg.SHMAdminBaseURL == "" {
+			return cfg, errors.New("SHM_ADMIN_BASE_URL is required when TELEGRAM_BOT_TOKENS_BY_CATEGORY_JSON is set")
+		}
+		if cfg.SHMAdminLogin == "" || cfg.SHMAdminPassword == "" {
+			return cfg, errors.New("SHM_ADMIN_LOGIN and SHM_ADMIN_PASSWORD are required when TELEGRAM_BOT_TOKENS_BY_CATEGORY_JSON is set")
+		}
 	}
 
 	return cfg, nil
