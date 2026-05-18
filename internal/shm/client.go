@@ -38,8 +38,7 @@ func NewClient(baseURL, authHeaderName, authHeaderValue string, timeout time.Dur
 }
 
 func (c *Client) ServiceCategory(ctx context.Context, userServiceID int) (string, error) {
-	filter := fmt.Sprintf(`{"user_service_id":%d}`, userServiceID)
-	filter = fmt.Sprintf(`%s`, fmt.Sprintf(`{"user_service_id":%d}`, userServiceID))
+	filter := fmt.Sprintf("{%q:%d}", "user_service_id", userServiceID)
 	endpoint := c.baseURL + "/shm/v1/admin/user/service?filter=" + url.QueryEscape(filter)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
