@@ -11,6 +11,7 @@ import (
 	"github.com/ryabkov82/vff-remnawave-events/internal/notify"
 	"github.com/ryabkov82/vff-remnawave-events/internal/remnawave"
 	"github.com/ryabkov82/vff-remnawave-events/internal/resolver"
+	"github.com/ryabkov82/vff-remnawave-events/internal/shm"
 	"github.com/ryabkov82/vff-remnawave-events/internal/telegram"
 )
 
@@ -22,19 +23,23 @@ type Messenger interface {
 	SendMessage(chatID, text string) error
 }
 
-type Server struct {
-	cfg      config.Config
-	store    *dedup.Store
-	resolver RecipientResolver
-	telegram Messenger
+type EventMessenger interface {
+	SendEventMessage(r *http.Request, event remnawave.Event, chatID, text string) error
 }
 
-func New(cfg config.Config, store *dedup.Store, recipientResolver RecipientResolver, telegramClient Messenger) *Server {
+type Server struct {
+	cfg       config.Config
+	store     *dedup.Store
+	resolver  RecipientResolver
+	messenger EventMessenger
+}
+
+func New(cfg config.Config, store *dedup.Store, recipientResolver RecipientResolver, messenger EventMessenger) *Server {
 	return &Server{
-		cfg:      cfg,
-		store:    store,
-		resolver: recipientResolver,
-		telegram: telegramClient,
+		cfg:       cfg,
+		store:     store,
+		resolver:  recipientResolver,
+		messenger: messenger,
 	}
 }
 
@@ -47,11 +52,12 @@ func NewDefault(cfg config.Config, store *dedup.Store) *Server {
 	)
 }
 
-func newMessenger(cfg config.Config) Messenger {
-	if cfg.MessengerDryRun {
-		return telegram.NewDryRunClient()
+func newMessenger(cfg config.Config) EventMessenger {
+	var categoryResolver telegram.CategoryResolver
+	if cfg.SHMAdminBaseURL != "" {
+		categoryResolver = shm.NewClient(cfg.SHMAdminBaseURL, cfg.SHMAdminAuthHeaderName, cfg.SHMAdminAuthHeaderValue, cfg.SHMRequestTimeout)
 	}
-	return telegram.NewClient(cfg.TelegramBotToken, cfg.TelegramParseMode)
+	return telegram.NewRoutedClient(cfg.TelegramBotToken, cfg.TelegramParseMode, categoryResolver, cfg.TelegramBotTokensByCategory, cfg.MessengerDryRun)
 }
 
 func (s *Server) Routes() http.Handler {
@@ -116,7 +122,7 @@ func (s *Server) remnawave(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.telegram.SendMessage(chatID, notify.TorrentBlockMessage(event)); err != nil {
+	if err := s.messenger.SendEventMessage(r, event, chatID, notify.TorrentBlockMessage(event)); err != nil {
 		log.Printf("telegram send failed chat_id=%s user_id=%s error=%v", chatID, remnawave.RawToString(event.Data.User.ID), err)
 		writeJSON(w, http.StatusOK, map[string]string{"status": "telegram_failed"})
 		return
